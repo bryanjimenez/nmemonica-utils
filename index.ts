@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import startService from "./src/app.js";
-import { bold, yellow } from "./utils/consoleColor.js";
+import { bold, yellow } from "./utils/console.js";
 import { lan } from "./utils/host.js";
 import { ca } from "./utils/signed-ca.js";
 
@@ -16,7 +16,6 @@ const cli = Object.freeze({
   },
   CERT_USER: { cmd: ["--user", "-u"], desc: "Only create client certificates" },
   LAN_HOST: { cmd: ["--host", "-h"], desc: "Display host ip information" },
-
 });
 
 function showUsage(name: string, version: string) {

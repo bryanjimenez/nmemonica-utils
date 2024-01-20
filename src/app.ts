@@ -5,7 +5,7 @@ import { lan } from "../utils/host.js";
 import { ca } from "../utils/signed-ca.js";
 import { custom404, customError, log } from "./helper/utilHandlers.js";
 import { getCA, getClient } from "./routes/certificate.js";
-import { blue, cyan, magenta, red, yellow } from "../utils/consoleColor.js";
+import { magenta, yellow } from "../utils/console.js";
 import { config } from "../utils/config.js";
 
 const httpPort = 3000; //config.port.http;

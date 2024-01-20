@@ -1,5 +1,5 @@
 import os from "os";
-import { yellow } from "./consoleColor.js";
+import { yellow } from "./console.js";
 
 // Get OS's external facing ip
 const n = os.networkInterfaces();

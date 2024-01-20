@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import fs from "fs";
 import { config } from "../../utils/config.js";
 import { isBundleId } from "../../utils/signed-ca.js";
-import { red } from "../../utils/consoleColor.js";
+import { red } from "../../utils/console.js";
 
 export function getCA(req: Request, res: Response, next: NextFunction) {
   res.set("Content-Type", "application/pkcs10");

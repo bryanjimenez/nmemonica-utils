@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { lan } from "./host.js";
 import { config } from "./config.js";
-import { cyan } from "./consoleColor.js";
+import { cyan } from "./console.js";
 import { promptUser } from "./prompt.js";
 
 const hasRequiredCertificates = () => {

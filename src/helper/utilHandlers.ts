@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { cyan, red } from "../../utils/consoleColor.js";
+import { cyan, red } from "../../utils/console.js";
 
 /**
  * Check origin
