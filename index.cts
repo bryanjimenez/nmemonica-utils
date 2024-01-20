@@ -13,7 +13,6 @@ const cli = Object.freeze({
   },
   CERT_USER: { cmd: ["--user", "-u"], desc: "Only create client certificates" },
   LAN_HOST: { cmd: ["--host", "-h"], desc: "Display host ip information" },
-
 });
 
 function showUsage(name: string, version: string) {
@@ -47,7 +46,7 @@ function showUsage(name: string, version: string) {
   );
 
   console.log("\nCommands:");
-  void import("./utils/consoleColor")
+  void import("./utils/console.js")
     .then(({ bold }) => {
       Object.values(cli).forEach((commands) => {
         const tab = 10;
@@ -61,7 +60,6 @@ function showUsage(name: string, version: string) {
           );
         }
       });
-
     })
     .then(() => {
       process.exit();
@@ -71,16 +69,16 @@ function showUsage(name: string, version: string) {
 function getPkgRoot() {
   let pkgRoot;
   switch (true) {
-    case process.argv[1].endsWith("/dist/esm/"):
-      pkgRoot = process.argv[1].replace("/dist/esm/", "");
+    case process.argv[1].endsWith("/dist/cjs/"):
+      pkgRoot = process.argv[1].replace("/dist/cjs/", "");
       break;
-    case process.argv[1].endsWith("/dist/esm"):
-      pkgRoot = process.argv[1].replace("/dist/esm", "");
+    case process.argv[1].endsWith("/dist/cjs"):
+      pkgRoot = process.argv[1].replace("/dist/cjs", "");
       break;
-    case process.argv[1].endsWith("/dist/esm/index.js"):
-      pkgRoot = process.argv[1].replace("/dist/esm/index.js", "");
+    case process.argv[1].endsWith("/dist/cjs/index.js"):
+      pkgRoot = process.argv[1].replace("/dist/cjs/index.js", "");
       break;
-    case process.argv[1].endsWith("@nmemonica/snservice"):
+    case process.argv[1].endsWith("@nmemonica/utils"):
       pkgRoot = process.argv[1];
       break;
     default:
@@ -107,7 +105,7 @@ void import("./src/app.js").then(({ default: startService }) => {
       case cli.CERT_ANY.cmd[0]:
       case cli.CERT_ANY.cmd[1]:
         void import("./utils/signed-ca.js").then(({ ca }) => {
-          void import("./utils/consoleColor").then(({ yellow }) => {
+          void import("./utils/console.js").then(({ yellow }) => {
             // running from cli
             void ca
               .get()

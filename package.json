@@ -1,11 +1,29 @@
 {
   "name": "@nmemonica/utils",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Utilities and Cert Exchange service",
   "type": "module",
   "main": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
   "exports": {
+    "./signed-ca":{
+      "types": "./dist/types/utils/signed-ca.d.ts",
+      "import": "./dist/esm/utils/signed-ca.js",
+      "require": "./dist/cjs/utils/signed-ca.js",
+      "default": "./dist/esm/utils/signed-ca.js"
+    },
+    "./console":{
+      "types": "./dist/types/utils/console.d.ts",
+      "import": "./dist/esm/utils/console.js",
+      "require": "./dist/cjs/utils/console.js",
+      "default": "./dist/esm/utils/console.js"
+    },
+    "./host":{
+      "types": "./dist/types/utils/host.d.ts",
+      "import": "./dist/esm/utils/host.js",
+      "require": "./dist/cjs/utils/host.js",
+      "default": "./dist/esm/utils/host.js"
+    },
     "./*": {
       "types": "./dist/types/*.d.ts",
       "import": "./dist/esm/*.js",

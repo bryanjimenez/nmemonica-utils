@@ -2,12 +2,19 @@ import fs from "node:fs";
 import path from "node:path";
 import { CrtParameters } from "./signed-ca.js";
 
-interface ServiceConfiguration {
+const utilDefault = <const>{ port: { http: 3000, https: 3443 } };
 
+interface ServiceConfiguration {
   port: {
     ui: number;
     http: number;
     https: number;
+    cert: {
+      http: number;
+      https: number;
+      defaultHttp: typeof utilDefault.port.http;
+      defaultHttps: typeof utilDefault.port.https;
+    };
   };
 
   ca: {
@@ -41,12 +48,25 @@ function getConfig() {
     fs.readFileSync(projectRoot + configPath, { encoding: "utf-8" })
   ) as ServiceConfiguration;
 
-  if (config.port.ui === undefined) {
-    throw new Error("Missing app ui port in config file");
-  }
   if (config.port.https === undefined) {
-    throw new Error("Missing service https port in config file");
+    throw new Error("Missing App service https port in config file");
   }
+
+  if (config.port.cert.http === undefined) {
+    console.log("Missing Util service http port in config file");
+    console.log("Using default port: " + utilDefault.port.http);
+  }
+
+  if (config.port.cert.https === undefined) {
+    console.log("Missing Util service https port in config file");
+    console.log("Using default port: " + utilDefault.port.https);
+  }
+
+  config.port.cert = {
+    ...config.port.cert,
+    defaultHttp: utilDefault.port.http,
+    defaultHttps: utilDefault.port.https,
+  };
 
   if (config.directory.ca === undefined) {
     throw new Error("Missing CA directory path in config file");
