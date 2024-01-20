@@ -3,17 +3,13 @@ import http from "node:http";
 import https from "node:https";
 import { lan } from "../utils/host.js";
 import { ca } from "../utils/signed-ca.js";
-import {
-  custom404,
-  customError,
-  log,
-} from "./helper/utilHandlers.js";
+import { custom404, customError, log } from "./helper/utilHandlers.js";
 import { getCA, getClient } from "./routes/certificate.js";
 import { blue, cyan, magenta, red, yellow } from "../utils/consoleColor.js";
 import { config } from "../utils/config.js";
 
-const httpPort = 3000//config.port.http;
-const httpsPort = 3443//config.port.https;
+const httpPort = 3000; //config.port.http;
+const httpsPort = 3443; //config.port.https;
 
 if (!lan.address) {
   throw new Error("Could not get host IP");
@@ -22,15 +18,13 @@ if (!lan.address) {
 const localhost = lan.address; // or "localhost"
 export const serviceIP = lan.address; // or lan.hostname
 
-
-export default async function askPermissions() {
-
+export default async function runService() {
   const app = express();
 
   app.disable("x-powered-by");
-  app.use(log)
+  app.use(log);
 
-  app.get("/", (req, res)=>{
+  app.get("/", (req, res) => {
     res.send(`
     <!doctype html>
     <html lang="en">
@@ -89,16 +83,19 @@ export default async function askPermissions() {
         </ol>
       </body>
     </html>
-    `)
-  })
-
+    `);
+  });
 
   // TODO: remove question mark
-  app.get(config.route.getCa+"?", getCA);
+  app.get(config.route.getCa + "?", getCA);
   app.get(config.route.getCa, getCA);
 
-  app.post(config.route.getClient, express.urlencoded({ extended: true }), getClient);
-  app.get(config.route.getClient, (req, res)=>{
+  app.post(
+    config.route.getClient,
+    express.urlencoded({ extended: true }),
+    getClient
+  );
+  app.get(config.route.getClient, (req, res) => {
     res.send(`
     <!doctype html>
     <html lang="en">
@@ -120,14 +117,15 @@ export default async function askPermissions() {
         </form>
       </body>
     </html>
-    `)
-  })
+    `);
+  });
 
   app.use(custom404);
   app.use(customError);
 
-  await ca.createServer()
-  void  ca.get()
+  await ca.createServer();
+  void ca
+    .get()
     .catch(() => {
       console.log(yellow("\nCreating Certificate Authority"));
       return ca.createNeeded();
@@ -136,7 +134,9 @@ export default async function askPermissions() {
       const httpSever = http.createServer(app);
       httpSever.listen(httpPort, localhost, 0, () => {
         console.log("\nCA http service");
-        console.log(yellow("http://") + localhost + yellow(":" + httpPort+"/getCA"));
+        console.log(
+          yellow("http://") + localhost + yellow(":" + httpPort + "/getCA")
+        );
       });
 
       if (!("chain" in intermediate) || !intermediate.chain) {
@@ -157,7 +157,11 @@ export default async function askPermissions() {
       );
       httpsServer.listen(httpsPort, serviceIP, 0, () => {
         console.log("\nClient Cert https service");
-        console.log(magenta("https://") + serviceIP + magenta(":" + httpsPort+"/getClient"));
+        console.log(
+          magenta("https://") +
+            serviceIP +
+            magenta(":" + httpsPort + "/getClient")
+        );
         console.log("\n");
       });
     });

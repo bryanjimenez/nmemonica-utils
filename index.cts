@@ -71,16 +71,16 @@ function showUsage(name: string, version: string) {
 function getPkgRoot() {
   let pkgRoot;
   switch (true) {
-    case process.argv[1].endsWith("/dist/esm/"):
-      pkgRoot = process.argv[1].replace("/dist/esm/", "");
+    case process.argv[1].endsWith("/dist/cjs/"):
+      pkgRoot = process.argv[1].replace("/dist/cjs/", "");
       break;
-    case process.argv[1].endsWith("/dist/esm"):
-      pkgRoot = process.argv[1].replace("/dist/esm", "");
+    case process.argv[1].endsWith("/dist/cjs"):
+      pkgRoot = process.argv[1].replace("/dist/cjs", "");
       break;
-    case process.argv[1].endsWith("/dist/esm/index.js"):
-      pkgRoot = process.argv[1].replace("/dist/esm/index.js", "");
+    case process.argv[1].endsWith("/dist/cjs/index.js"):
+      pkgRoot = process.argv[1].replace("/dist/cjs/index.js", "");
       break;
-    case process.argv[1].endsWith("@nmemonica/snservice"):
+    case process.argv[1].endsWith("@nmemonica/utils"):
       pkgRoot = process.argv[1];
       break;
     default:
