@@ -52,20 +52,8 @@ function getConfig() {
     throw new Error("Missing App service https port in config file");
   }
 
-  if (config.port.cert.http === undefined) {
-    console.log("Missing Util service http port in config file");
-    console.log("Using default port: " + utilDefault.port.http);
-  }
-
-  if (config.port.cert.https === undefined) {
-    console.log("Missing Util service https port in config file");
-    console.log("Using default port: " + utilDefault.port.https);
-  }
-
   config.port.cert = {
-    ...config.port.cert,
-    defaultHttp: utilDefault.port.http,
-    defaultHttps: utilDefault.port.https,
+    ...config.port.cert ?? {http: utilDefault.port.http, https: utilDefault.port.https},
   };
 
   if (config.directory.ca === undefined) {
