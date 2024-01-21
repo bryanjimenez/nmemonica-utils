@@ -8,8 +8,8 @@ import { getCA, getClient } from "./routes/certificate.js";
 import { magenta, yellow } from "../utils/console.js";
 import { config } from "../utils/config.js";
 
-const httpPort = config.port.cert.http ?? config.port.cert.defaultHttp;
-const httpsPort = config.port.cert.https ?? config.port.cert.defaultHttps;
+const httpPort = config.port.cert.http;
+const httpsPort = config.port.cert.https;
 
 if (!lan.address) {
   throw new Error("Could not get host IP");
