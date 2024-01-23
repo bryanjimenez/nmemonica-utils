@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { lan } from "./host.js";
 import { config } from "./config.js";
-import { cyan } from "./console.js";
+import { bold, cyan, yellow } from "./console.js";
 import { promptUser } from "./prompt.js";
 
 const hasRequiredCertificates = () => {
@@ -64,8 +64,6 @@ export interface CrtParameters {
  * DHParam  
  */
 function createNeeded() {
-  console.log("IP: " + ip);
-  console.log("Hostname: " + host);
 
   // create directory if not there
   if (!fs.existsSync(cwd)) {
@@ -256,6 +254,8 @@ function get() {
  * Root Certificate Authority
  */
 function buildRootCertificate() {
+  console.log(`${yellow("Creating")} ${bold("Root")} Certificate Authority`);
+
   // generate root.key.pem
   spawnSync(
     "openssl",
@@ -321,6 +321,8 @@ function buildRootCertificate() {
  * Intermediate Certificate
  */
 function buildIntermediateCertificate() {
+  console.log(`${yellow("Creating")} ${bold("Intermediate")} Certificate Authority`);
+
   const { key, crt, csr, cnf, chain } = config.ca.intermediate;
 
   // generate intermediate.key.pem
@@ -396,6 +398,8 @@ function buildIntermediateCertificate() {
  * Server Certificate
  */
 function buildServerCertificate() {
+  console.log(`${yellow("Creating")} ${bold("Server")} Certificate Authority`);
+
   const { key, crt, csr, cnf } = config.ca.server;
   // generate server.key.pem
   spawnSync("openssl", ["ecparam", "-out", key, "-name", ecName, "-genkey"], {
@@ -459,6 +463,8 @@ function buildServerCertificate() {
  * Generage DH param for longer bit key
  */
 function buildDHParam() {
+  console.log(`${yellow("Creating")} ${bold("dh-param")}`);
+
   // https://security.stackexchange.com/questions/94390/whats-the-purpose-of-dh-parameters
 
   spawnSync(
@@ -472,9 +478,10 @@ function buildDHParam() {
  * Client Certificate
  */
 async function buildClientCertificate() {
-  console.log("\nClient certificate");
-  const pw = await promptUser(cyan("password:"));
-  const pwCheck = await promptUser(cyan("again:"));
+  console.log(`${yellow("Creating")} ${bold("Client")} Certificate Authority`);
+
+  const pw = await promptUser(cyan("  password:"));
+  const pwCheck = await promptUser(cyan("  again:"));
 
   if (pw !== pwCheck) {
     throw new Error("Client certificate password didn't match");
@@ -553,7 +560,7 @@ async function buildClientCertificate() {
   //   {cwd}
   // )
 
-  console.log("Your client certificate id is: " + cyan(id));
+  console.log("  Your client certificate id is: " + cyan(id));
 
   spawnSync(
     "openssl",
