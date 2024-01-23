@@ -37,7 +37,7 @@ export default async function runService() {
         <br /><br />
         <ol>
           <li>
-            Certificate Auhority
+            Certificate Authority
             <br />
             <form
               action="http://${serviceIP}:${httpPort}${config.route.getCa}"
@@ -123,14 +123,18 @@ export default async function runService() {
   app.use(custom404);
   app.use(customError);
 
-  await ca.createServer();
   void ca
     .get()
+    .then(async ({ intermediate, server, dhparam })=>{
+      await ca.createServer();
+
+      return { intermediate, server, dhparam }
+    })
     .catch(() => {
-      console.log(yellow("\nCreating Certificate Authority"));
       return ca.createNeeded();
     })
     .then(({ intermediate, server, dhparam }) => {
+
       const httpSever = http.createServer(app);
       httpSever.listen(httpPort, localhost, 0, () => {
         console.log("\nCA http service");

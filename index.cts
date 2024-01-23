@@ -113,7 +113,6 @@ void import("./src/app.js").then(({ default: startService }) => {
                 console.log("CA already exists");
               })
               .catch(() => {
-                console.log(yellow("\nCreating Certificate Authority"));
                 return ca.createNeeded();
               })
               .then(() => {

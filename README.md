@@ -1,9 +1,23 @@
-# Certificate Exchange Service (Development) for Nmemonica
+# @nmemonica/utils
+>Certificate Exchange Service (for development) for [@nmemonica/snservice](https://github.com/bryanjimenez/snservice)
+
+[![npm version](https://img.shields.io/npm/v/@nmemonica/utils.svg)](https://www.npmjs.org/package/@nmemonica/utils)
+[![npm pkg](https://github.com/bryanjimenez/nmemonica-utils/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/bryanjimenez/nmemonica-utils/actions/workflows/npm-publish.yml)
 
 Creates required client and server certificates for mTLS  
 Serves a download page for the client certificates (CA and pkcs12).
 
 Includes other utilities like console color and network information
+
+## Prerequisites
+
+- A server (Device running this service) with
+  - [Git](https://git-scm.com/)
+  - [Node](https://nodejs.org)
+  - [OpenSSL](https://openssl.org)
+- A client (Device with browser viewing Nmemonica)
+  - Internet access
+  - Network access to the server
 
 ## Service Install and start
 This will be installed as a dependency, but can be ran standalone:
@@ -18,6 +32,10 @@ npm install
 npm run build
 # run service
 node ./dist/esm
+```
+As a dependency the certificate exchange service can be ran:
+```
+node ./node_modules/@nmemonica/utils
 ```
 
 During the first time run the service will create server certificates and will ask user for client certificate password and provide `client_id`.

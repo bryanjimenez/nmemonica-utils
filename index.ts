@@ -98,7 +98,6 @@ if (
           console.log("CA already exists");
         })
         .catch(() => {
-          console.log(yellow("\nCreating Certificate Authority"));
           return ca.createNeeded();
         })
         .then(() => {
