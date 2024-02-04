@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "node:path";
+import path, { sep } from "node:path";
 import { CrtParameters } from "./signed-ca.js";
 import { bold } from "./console.js";
 
@@ -40,13 +40,13 @@ const projectRoot = path.resolve();
 
 function getConfig() {
   const configFile = "snservice.conf.json";
-  if (!fs.existsSync(projectRoot + "/" + configFile)) {
+  if (!fs.existsSync(projectRoot + sep + configFile)) {
     throw new Error(
       `Missing config file ${bold(configFile)} in ${projectRoot}`
     );
   }
   const config = JSON.parse(
-    fs.readFileSync(projectRoot + "/" + configFile, { encoding: "utf-8" })
+    fs.readFileSync(projectRoot + sep + configFile, { encoding: "utf-8" })
   ) as ServiceConfiguration;
 
   if (config.service.port === undefined) {
