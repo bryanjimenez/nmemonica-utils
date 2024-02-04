@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import startService from "./src/app.js";
-import { bold, yellow } from "./utils/console.js";
+import { bold } from "./utils/console.js";
 import { lan } from "./utils/host.js";
 import { ca } from "./utils/signed-ca.js";
 
@@ -125,7 +125,7 @@ if (
       break;
 
     case undefined:
-      void startService();
+      startService();
       break;
 
     default:
