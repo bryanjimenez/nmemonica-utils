@@ -8,8 +8,8 @@ import { getCA, getClient } from "./routes/certificate.js";
 import { magenta, yellow } from "../utils/console.js";
 import { config } from "../utils/config.js";
 
-const httpPort = config.port.cert.http;
-const httpsPort = config.port.cert.https;
+const httpPort = config.cert.port.http;
+const httpsPort = config.cert.port.https;
 
 if (!lan.address) {
   throw new Error("Could not get host IP");
@@ -18,13 +18,17 @@ if (!lan.address) {
 const localhost = lan.address; // or "localhost"
 export const serviceIP = lan.address; // or lan.hostname
 
-export default async function runService() {
+export default function runService() {
   const app = express();
 
   app.disable("x-powered-by");
   app.use(log);
 
   app.get("/", (req, res) => {
+    const secureDownload = `client id: <input type="text" name="uid" size="5" />&nbsp;<input type="submit" value="download"/>`;
+
+    const routeToSecure = `<input onclick="document.location='https://${serviceIP}:${httpsPort}'" type="button" value="next"/>`;
+
     res.send(`
     <!doctype html>
     <html lang="en">
@@ -40,8 +44,8 @@ export default async function runService() {
             Certificate Authority
             <br />
             <form
-              action="http://${serviceIP}:${httpPort}${config.route.getCa}"
-              method="get"
+              action="http${req.secure ? "s" : ""}://${serviceIP}:${httpPort}${config.route.getCa}"
+              method="post"
             >
               <input type="submit" value="download" />
             </form>
@@ -55,10 +59,7 @@ export default async function runService() {
               action="https://${serviceIP}:${httpsPort}${config.route.getClient}"
               method="post"
             >
-              client id: <input type="text" name="uid" size="5" />&nbsp;<input
-                type="submit"
-                value="download"
-              />
+              ${req.secure ? secureDownload : routeToSecure}
             </form>
             <br />
           </li>
@@ -72,7 +73,7 @@ export default async function runService() {
             </p>
             <ol>
               <li>
-                Enter <b>${serviceIP}</b>:<b>${config.port.https}</b>
+                Enter <b>${serviceIP}</b>:<b>${config.service.port}</b>
                 <br />
                 Points app to use local service
               </li>
@@ -86,8 +87,7 @@ export default async function runService() {
     `);
   });
 
-  // TODO: remove question mark
-  app.get(config.route.getCa + "?", getCA);
+  app.post(config.route.getCa, getCA);
   app.get(config.route.getCa, getCA);
 
   app.post(
@@ -125,16 +125,15 @@ export default async function runService() {
 
   void ca
     .get()
-    .then(async ({ intermediate, server, dhparam })=>{
+    .then(async ({ intermediate, server, dhparam }) => {
       await ca.createServer();
 
-      return { intermediate, server, dhparam }
+      return { intermediate, server, dhparam };
     })
     .catch(() => {
       return ca.createNeeded();
     })
     .then(({ intermediate, server, dhparam }) => {
-
       const httpSever = http.createServer(app);
       httpSever.listen(httpPort, localhost, 0, () => {
         console.log("\nCA http service");

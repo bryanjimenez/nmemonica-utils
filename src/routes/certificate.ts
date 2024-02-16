@@ -1,5 +1,6 @@
+import fs from "node:fs";
+import { sep } from "node:path";
 import type { Request, Response, NextFunction } from "express";
-import fs from "fs";
 import { config } from "../../utils/config.js";
 import { isBundleId } from "../../utils/signed-ca.js";
 import { red } from "../../utils/console.js";
@@ -11,7 +12,7 @@ export function getCA(req: Request, res: Response, next: NextFunction) {
   const intermediateCertFile = config.ca.intermediate.crt;
 
   const readStream = fs.createReadStream(
-    `${certificateDir}/${intermediateCertFile}`
+    `${certificateDir}${sep}${intermediateCertFile}`
   );
   readStream.on("error", (err) => {
     console.log(`${red("Read failed")} for ${intermediateCertFile}`);
@@ -41,7 +42,9 @@ export function getClient(req: Request, res: Response, next: NextFunction) {
     `.${clientId}.`
   );
 
-  const readStream = fs.createReadStream(`${certificateDir}/${clientFile}`);
+  const readStream = fs.createReadStream(
+    `${certificateDir}${sep}${clientFile}`
+  );
   readStream.on("error", (err) => {
     console.log(`${red("Read failed")} for ${clientFile}`);
     next(err);

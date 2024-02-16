@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "node:path";
+import path, { sep } from "node:path";
 import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { lan } from "./host.js";
@@ -9,11 +9,17 @@ import { promptUser } from "./prompt.js";
 
 const hasRequiredCertificates = () => {
   if (
-    fs.existsSync(path.normalize(`${cwd}/${config.ca.intermediate.key}`)) &&
-    fs.existsSync(path.normalize(`${cwd}/${config.ca.intermediate.crt}`)) &&
-    fs.existsSync(path.normalize(`${cwd}/${config.ca.intermediate.chain}`)) &&
-    fs.existsSync(path.normalize(`${cwd}/${config.ca.server.key}`)) &&
-    fs.existsSync(path.normalize(`${cwd}/${config.ca.server.crt}`))
+    fs.existsSync(
+      path.normalize(`${cwd}${sep}${config.ca.intermediate.key}`)
+    ) &&
+    fs.existsSync(
+      path.normalize(`${cwd}${sep}${config.ca.intermediate.crt}`)
+    ) &&
+    fs.existsSync(
+      path.normalize(`${cwd}${sep}${config.ca.intermediate.chain}`)
+    ) &&
+    fs.existsSync(path.normalize(`${cwd}${sep}${config.ca.server.key}`)) &&
+    fs.existsSync(path.normalize(`${cwd}${sep}${config.ca.server.crt}`))
   ) {
     return true;
   }
@@ -61,32 +67,31 @@ export interface CrtParameters {
  * Intermediate CA  
  * Server  
  * Client  
- * DHParam  
+ * DHParam
  */
 function createNeeded() {
-
   // create directory if not there
   if (!fs.existsSync(cwd)) {
     fs.mkdirSync(cwd, { recursive: true });
   }
 
-  if (!fs.existsSync(`${cwd}/${config.ca.dhParam.name}`)) {
+  if (!fs.existsSync(`${cwd}${sep}${config.ca.dhParam.name}`)) {
     buildDHParam();
   }
 
   if (
-    !fs.existsSync(path.normalize(`${cwd}/${config.ca.root.key}`)) ||
-    !fs.existsSync(path.normalize(`${cwd}/${config.ca.root.crt}`))
+    !fs.existsSync(path.normalize(`${cwd}${sep}${config.ca.root.key}`)) ||
+    !fs.existsSync(path.normalize(`${cwd}${sep}${config.ca.root.crt}`))
   ) {
     return createRoot();
   } else if (
-    !fs.existsSync(path.normalize(`${cwd}/${config.ca.intermediate.key}`)) ||
-    !fs.existsSync(path.normalize(`${cwd}/${config.ca.intermediate.crt}`))
+    !fs.existsSync(
+      path.normalize(`${cwd}${sep}${config.ca.intermediate.key}`)
+    ) ||
+    !fs.existsSync(path.normalize(`${cwd}${sep}${config.ca.intermediate.crt}`))
   ) {
     return createIntermediate();
-  }
-
-  else {
+  } else {
     return createServer().then(() => get());
   }
 }
@@ -96,7 +101,7 @@ function createNeeded() {
  * Root CA  
  * Intermediate CA  
  * Server  
- * Client  
+ * Client
  */
 function createRoot() {
   // create directory if not there
@@ -111,7 +116,7 @@ function createRoot() {
     delFileP = [
       ...delFileP,
       new Promise((resolve) => {
-        fs.rm(`${cwd}/${file}`, resolve);
+        fs.rm(`${cwd}${sep}${file}`, resolve);
       }),
     ];
   });
@@ -130,7 +135,7 @@ function createRoot() {
  * This script creates a self signed key cert pairs for:  
  * Intermediate CA  
  * Server  
- * Client  
+ * Client
  */
 function createIntermediate() {
   // create directory if not there
@@ -145,7 +150,7 @@ function createIntermediate() {
     delFileP = [
       ...delFileP,
       new Promise((resolve) => {
-        fs.rm(`${cwd}/${file}`, resolve);
+        fs.rm(`${cwd}${sep}${file}`, resolve);
       }),
     ];
   });
@@ -176,7 +181,7 @@ function createServer() {
     delFileP = [
       ...delFileP,
       new Promise((resolve) => {
-        fs.rm(`${cwd}/${file}`, resolve);
+        fs.rm(`${cwd}${sep}${file}`, resolve);
       }),
     ];
   });
@@ -207,27 +212,30 @@ function get() {
   }>((resolve, reject) => {
     if (hasRequiredCertificates()) {
       const intermediateKey = fs.readFileSync(
-        path.normalize(
-        `${cwd}/${config.ca.intermediate.key}`),
+        path.normalize(`${cwd}${sep}${config.ca.intermediate.key}`),
         { encoding: "utf-8" }
       );
       const intermediateCrt = fs.readFileSync(
-        path.normalize(
-        `${cwd}/${config.ca.intermediate.crt}`),
+        path.normalize(`${cwd}${sep}${config.ca.intermediate.crt}`),
         { encoding: "utf-8" }
       );
       const intermediateChain = fs.readFileSync(
-        path.normalize(
-        `${cwd}/${config.ca.intermediate.chain}`),
+        path.normalize(`${cwd}${sep}${config.ca.intermediate.chain}`),
         { encoding: "utf-8" }
       );
 
-      const serverKey = fs.readFileSync(path.normalize(`${cwd}/${config.ca.server.key}`), {
-        encoding: "utf-8",
-      });
-      const serverCrt = fs.readFileSync(path.normalize(`${cwd}/${config.ca.server.crt}`), {
-        encoding: "utf-8",
-      });
+      const serverKey = fs.readFileSync(
+        path.normalize(`${cwd}${sep}${config.ca.server.key}`),
+        {
+          encoding: "utf-8",
+        }
+      );
+      const serverCrt = fs.readFileSync(
+        path.normalize(`${cwd}${sep}${config.ca.server.crt}`),
+        {
+          encoding: "utf-8",
+        }
+      );
 
       const intermediate = {
         key: intermediateKey,
@@ -236,11 +244,11 @@ function get() {
       };
       const server = { key: serverKey, crt: serverCrt };
 
-      if (!fs.existsSync(`${cwd}/${config.ca.dhParam.name}`)) {
+      if (!fs.existsSync(`${cwd}${sep}${config.ca.dhParam.name}`)) {
         buildDHParam();
       }
 
-      const dhparam = fs.readFileSync(`${cwd}/${config.ca.dhParam.name}`, {
+      const dhparam = fs.readFileSync(`${cwd}${sep}${config.ca.dhParam.name}`, {
         encoding: "utf-8",
       });
 
@@ -291,9 +299,13 @@ function buildRootCertificate() {
   subjectKeyIdentifier = hash`;
   // nameConstraints = permitted;IP:${ip}/255.255.255.0,permitted;DNS:${host}`;
 
-  fs.writeFileSync(path.normalize(`${cwd}/${config.ca.root.cnf}`), rootCNFString, {
-    encoding: "utf-8",
-  });
+  fs.writeFileSync(
+    path.normalize(`${cwd}${sep}${config.ca.root.cnf}`),
+    rootCNFString,
+    {
+      encoding: "utf-8",
+    }
+  );
 
   // generate ROOT signed CSR (root.crt.pem) w/ root.openssl.cnf
   spawnSync(
@@ -321,7 +333,9 @@ function buildRootCertificate() {
  * Intermediate Certificate
  */
 function buildIntermediateCertificate() {
-  console.log(`${yellow("Creating")} ${bold("Intermediate")} Certificate Authority`);
+  console.log(
+    `${yellow("Creating")} ${bold("Intermediate")} Certificate Authority`
+  );
 
   const { key, crt, csr, cnf, chain } = config.ca.intermediate;
 
@@ -354,7 +368,9 @@ function buildIntermediateCertificate() {
   const myCNFString = `basicConstraints = critical, CA:TRUE, pathlen:0\n
   keyUsage = critical, digitalSignature, cRLSign, keyCertSign`;
 
-  fs.writeFileSync(path.normalize(`${cwd}/${cnf}`), myCNFString, { encoding: "utf-8" });
+  fs.writeFileSync(path.normalize(`${cwd}${sep}${cnf}`), myCNFString, {
+    encoding: "utf-8",
+  });
 
   // generate intermediate signed CSR (ee.pem) w/ intermediate.openssl.cnf
   spawnSync(
@@ -381,16 +397,26 @@ function buildIntermediateCertificate() {
 
   // create certificate chain (intermediate+root)
   if (chain) {
-    const intermediateCrtStr = fs.readFileSync(path.normalize(`${cwd}/${crt}`), {
-      encoding: "utf-8",
-    });
-    const rootCrtStr = fs.readFileSync(path.normalize(`${cwd}/${config.ca.root.crt}`), {
-      encoding: "utf-8",
-    });
+    const intermediateCrtStr = fs.readFileSync(
+      path.normalize(`${cwd}${sep}${crt}`),
+      {
+        encoding: "utf-8",
+      }
+    );
+    const rootCrtStr = fs.readFileSync(
+      path.normalize(`${cwd}${sep}${config.ca.root.crt}`),
+      {
+        encoding: "utf-8",
+      }
+    );
 
-    fs.writeFileSync(path.normalize(`${cwd}/${chain}`), intermediateCrtStr + rootCrtStr, {
-      encoding: "utf-8",
-    });
+    fs.writeFileSync(
+      path.normalize(`${cwd}${sep}${chain}`),
+      intermediateCrtStr + rootCrtStr,
+      {
+        encoding: "utf-8",
+      }
+    );
   }
 }
 
@@ -432,8 +458,10 @@ function buildServerCertificate() {
   nsCertType = server\n
   keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment\n
   extendedKeyUsage = serverAuth`;
-  
-  fs.writeFileSync(path.normalize(`${cwd}/${cnf}`), myCNFString, { encoding: "utf-8" });
+
+  fs.writeFileSync(path.normalize(`${cwd}${sep}${cnf}`), myCNFString, {
+    encoding: "utf-8",
+  });
 
   // generate server signed CSR (server.pem) w/ server.openssl.cnf
   spawnSync(
@@ -528,7 +556,9 @@ async function buildClientCertificate() {
   keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment\n
   extendedKeyUsage = clientAuth`;
   // subjectAltName = IP:${ip}, DNS:${host}\n
-  fs.writeFileSync(path.normalize(`${cwd}/${cnf}`), myCNFString, { encoding: "utf-8" });
+  fs.writeFileSync(path.normalize(`${cwd}${sep}${cnf}`), myCNFString, {
+    encoding: "utf-8",
+  });
 
   // generate client signed CSR (client.crt.pem) w/ client.openssl.cnf
   spawnSync(

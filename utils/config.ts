@@ -1,15 +1,15 @@
 import fs from "node:fs";
-import path from "node:path";
+import path, { sep } from "node:path";
 import { CrtParameters } from "./signed-ca.js";
+import { bold } from "./console.js";
 
 const utilDefault = <const>{ port: { http: 3000, https: 3443 } };
 
 interface ServiceConfiguration {
-  port: {
-    ui: number;
-    http: number;
-    https: number;
-    cert: {
+  ui: { port: number };
+  service: { port: number };
+  cert: {
+    port: {
       http: number;
       https: number;
       defaultHttp: typeof utilDefault.port.http;
@@ -39,21 +39,27 @@ interface ServiceConfiguration {
 const projectRoot = path.resolve();
 
 function getConfig() {
-  const configPath = "/snservice.conf.json";
-  if (!fs.existsSync(projectRoot + configPath)) {
-    console.log(projectRoot);
-    throw new Error("Missing config file " + projectRoot);
+  const configFile = "snservice.conf.json";
+  if (!fs.existsSync(projectRoot + sep + configFile)) {
+    throw new Error(
+      `Missing config file ${bold(configFile)} in ${projectRoot}`
+    );
   }
   const config = JSON.parse(
-    fs.readFileSync(projectRoot + configPath, { encoding: "utf-8" })
+    fs.readFileSync(projectRoot + sep + configFile, { encoding: "utf-8" })
   ) as ServiceConfiguration;
 
-  if (config.port.https === undefined) {
+  if (config.service.port === undefined) {
     throw new Error("Missing App service https port in config file");
   }
 
-  config.port.cert = {
-    ...config.port.cert ?? {http: utilDefault.port.http, https: utilDefault.port.https},
+  config.cert = {
+    ...(config.cert ?? {
+      port: {
+        http: utilDefault.port.http,
+        https: utilDefault.port.https,
+      },
+    }),
   };
 
   if (config.directory.ca === undefined) {

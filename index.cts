@@ -105,20 +105,18 @@ void import("./src/app.js").then(({ default: startService }) => {
       case cli.CERT_ANY.cmd[0]:
       case cli.CERT_ANY.cmd[1]:
         void import("./utils/signed-ca.js").then(({ ca }) => {
-          void import("./utils/console.js").then(({ yellow }) => {
-            // running from cli
-            void ca
-              .get()
-              .then(() => {
-                console.log("CA already exists");
-              })
-              .catch(() => {
-                return ca.createNeeded();
-              })
-              .then(() => {
-                process.exit();
-              });
-          });
+          // running from cli
+          void ca
+            .get()
+            .then(() => {
+              console.log("CA already exists");
+            })
+            .catch(() => {
+              return ca.createNeeded();
+            })
+            .then(() => {
+              process.exit();
+            });
         });
         break;
 
@@ -148,7 +146,7 @@ void import("./src/app.js").then(({ default: startService }) => {
         break;
 
       case undefined:
-        void startService();
+        startService();
         break;
 
       default:
