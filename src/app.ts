@@ -25,6 +25,10 @@ export default function runService() {
   app.use(log);
 
   app.get("/", (req, res) => {
+    const secureDownload = `client id: <input type="text" name="uid" size="5" />&nbsp;<input type="submit" value="download"/>`;
+
+    const routeToSecure = `<input onclick="document.location='https://${serviceIP}:${httpsPort}'" type="button" value="next"/>`;
+
     res.send(`
     <!doctype html>
     <html lang="en">
@@ -40,8 +44,8 @@ export default function runService() {
             Certificate Authority
             <br />
             <form
-              action="http://${serviceIP}:${httpPort}${config.route.getCa}"
-              method="get"
+              action="http${req.secure ? "s" : ""}://${serviceIP}:${httpPort}${config.route.getCa}"
+              method="post"
             >
               <input type="submit" value="download" />
             </form>
@@ -55,10 +59,7 @@ export default function runService() {
               action="https://${serviceIP}:${httpsPort}${config.route.getClient}"
               method="post"
             >
-              client id: <input type="text" name="uid" size="5" />&nbsp;<input
-                type="submit"
-                value="download"
-              />
+              ${req.secure ? secureDownload : routeToSecure}
             </form>
             <br />
           </li>
@@ -86,8 +87,7 @@ export default function runService() {
     `);
   });
 
-  // TODO: remove question mark
-  app.get(config.route.getCa + "?", getCA);
+  app.post(config.route.getCa, getCA);
   app.get(config.route.getCa, getCA);
 
   app.post(
